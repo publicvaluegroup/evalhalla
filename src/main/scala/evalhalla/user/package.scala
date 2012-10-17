@@ -1,13 +1,5 @@
 package evalhalla
 
-import org.openid4java.consumer.ConsumerManager;
-import org.openid4java.consumer.ConsumerException;
-import org.openid4java.discovery.Identifier;
-import org.openid4java.discovery.DiscoveryInformation;
-import org.openid4java.message.ax.FetchRequest;
-import org.openid4java.message.ax.FetchResponse;
-import org.openid4java.message.ax.AxMessage;
-import org.openid4java.OpenIDException;
 import javax.ws.rs._
 import evalhalla._
 import mjson.Json
@@ -28,24 +20,6 @@ class SecurityToken(h:HGHandle) extends HGPlainLink(h) with HGHandleHolder {
 @Path("/user")
 @Produces(Array("application/json"))
 class UserService {   
-    var j:Json = array("asdf", "asdfasD");
-    @GET
-    @Path("/openid/start/{openid}")    
-    def startOpenid(@PathParam("openid") openid:String):Json = {
-        //println("Login OpenID: " + openid)      
-        var consumerManager = new org.openid4java.consumer.ConsumerManager()
-        var discoveries = consumerManager.discover(openid)
-        var discovered = consumerManager.associate(discoveries)
-        var authReq = consumerManager.authenticate(discovered, "http://www.evalhalla.com/openid/callback");        
-        return jobj("ok", true:java.lang.Boolean);
-    }
-
-    @GET
-    @Path("/openid/callback")    
-    def openidCallback(@QueryParam("openid") openid:String):String = {
-        return "some url : " + openid;
-    }
-    
     @POST
     @Path("/login")    
     def authenticate(@FormParam("email") email:String, 

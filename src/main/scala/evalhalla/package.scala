@@ -9,20 +9,18 @@ package object evalhalla {
   
   val True = java.lang.Boolean.TRUE;
   val False = java.lang.Boolean.FALSE;
-  val defaultConfig:Json = Json.`object`("base", "/home/borislav/evalhalla",
-                                         "port", 8182:java.lang.Integer);
-  
   var graph:HyperGraph = null
   var db:HyperNodeJson = null
-  var config:Json = null
+  var config:Json = Json.`object`("port", 8182:java.lang.Integer)
   
-  def init(config:Json = defaultConfig) = {
-    evalhalla.config = config;    
-    graph = HGEnvironment.get(config.at("base").asString() + "/data/db")
+  def init(cfg:Json = null) = {
+    if (cfg != null)
+        evalhalla.config = cfg;
+    graph = HGEnvironment.get(config.at("dbLocation").asString())
     var hgconfig = new HGConfiguration()
     hgconfig.getTypeConfiguration().addSchema(new JsonTypeSchema())
     registerIndexers
-    db = new HyperNodeJson(graph);    
+    db = new HyperNodeJson(graph);
   }
   
   def ok:Json = Json.`object`("ok", True);

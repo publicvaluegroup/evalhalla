@@ -1,6 +1,7 @@
 package evalhalla
 
 import javax.ws.rs._
+import java.io.File
 
 object Start {
 
@@ -28,7 +29,12 @@ object Start {
         }
     }
     else if (args.length == 0) {
-        evalhalla.init()
+      // default configuration, use current directory as a base
+      var rootDir:File = new java.io.File(".")
+      println("No config file provided, using defaults at root " + rootDir.getCanonicalPath())
+      config.set("dbLocation", new File(rootDir, "db").getCanonicalPath())
+      config.set("siteLocation", new File(new File(rootDir, "src"), "main").getCanonicalPath())
+      evalhalla.init()
     }
     else {
       println("Usage Start json_config_file");
@@ -46,7 +52,7 @@ object Start {
     
     var html = new org.restlet.Application(server.getContext().createChildContext()) {  
         override def createInboundRoot:Restlet = {  
-            var dir = new Directory(getContext().createChildContext(), "file:" + config.at("base").asString() + "/src/html/");
+            var dir = new Directory(getContext().createChildContext(), "file:" + config.at("siteLocation").asString() + "/html/");
             dir.setIndexName("index.html");
             return dir;
         }
@@ -55,7 +61,7 @@ object Start {
     
     var jsapp = new org.restlet.Application(server.getContext().createChildContext()) {  
         override def createInboundRoot:Restlet = {  
-            return new Directory(getContext().createChildContext(), "file:" + config.at("base").asString() + "/src/javascript/");
+            return new Directory(getContext().createChildContext(), "file:" + config.at("siteLocation").asString() + "/javascript/");
         }
     };               
     router.attach("/javascript", jsapp).setMatchingMode(Template.MODE_STARTS_WITH);
