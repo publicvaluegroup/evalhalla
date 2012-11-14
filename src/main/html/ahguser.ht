@@ -1,0 +1,86 @@
+<div ng-controller="ahgUserController">
+
+<!-- LOGIN/LOGOUT -->
+<div align="right" style="margin-right:100px">
+<a id='loginToggle'  
+   href="#"
+   ng-click="showLogin=!showLogin"
+   ng-show="!isLoggedIn()">Login</a>
+<a ng-click="showRegister=true" ng-show="!isLoggedIn()">Register</a>
+
+<!-- LOGIN BOX -->
+<div class="controls well well-small" id='loginDiv' align="right" 
+     style="padding:5px; position:fixed; right:30px" ng-show='showLogin'>
+<div id='loginErrorDiv' style='color:red'>
+</div>
+<input type="text" placeholder="Email" ng-model="user.email"/>
+<br/>
+<input type="password" placeholder="Password" ng-model="user.password"/>
+<br/>
+<label align="left" class="checkbox inline" style="margin-right:20px">
+<input type="checkbox" ng-model="rememberUser">Remember me</label>
+<a class="btn btn-primary" ng-click='doLogin()'>Login</a>
+</div>
+<div align="right" ng-show='isLoggedIn()'>
+  <a class="btn btn-primary" ng-click="doLogout()">Sign Off</a>
+</div>
+</div>
+
+
+<!-- REGISTRATION VALIDATION BOX -->
+
+<div class="controls well well-small" align="right" 
+     style="padding:5px; position:fixed; right:30px" 
+     ng-show='showValidateToken'>
+<div align="left">
+<b>Welcome to eValhalla</b><br>
+Please verify your email address.
+<form class="nice">
+<div id='validationErrorDiv' style='color:red'></div>
+<strong>Enter validation code you received in your eValhalla registration email:</strong><br />
+<input type='input' ng-model='validationToken' style="display:inline-block" class="input-text" id='validationCode'>&nbsp;
+<button type='button' ng-click='validateRegistration()'>Submit</button>
+<br />
+<strong>Didn't receive email? Please reenter your email address:</strong><br />
+<input type='input' ng-model='user.email' style="display:inline-block" class="input-text" id='emailAddress'>&nbsp;
+<button type='button' ng-click='resendRegistrationConfirmation()'>Submit</button>
+</form>
+</div>
+</div>
+
+<!-- REGISTER/PROFILE FORM-->
+<div id='userProfileForm' ui-modal class="fade" ng-model="showRegister">
+<form name="registerForm" class="form-horizontal" ng-submit="startRegister">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>eValhalla Registration</h3>
+  </div>
+  <div class="modal-body">
+      <label>First Name</label>
+      <input type='text' id='firstName' name='firstName' placeholder='Firstname' 
+        required ng-model='user.firstName' format-help='First name is required.'>
+      <label>Last Name</label>
+      <input type='text' id='lastName' ng-model='user.lastName' placeholder='Lastname' 
+        name='lastName' required format-help='Last name is required.'>
+      <label>Email</label>
+      <input type="email" id="inputEmail" placeholder="Email" 
+        ng-model="user.email" required format-help='Correct email format expected.'>       
+      <label>Zip Code</label>
+      <input type='text' id='zipCode' name='zipCode'>
+      <label for='newpwd'>Password:</label>
+      <input id='newpwd' ng-pattern='/\d+/' required ng:minlength='8' name='newpwd' type='password'
+          ng-model="user.password" format-help='Password must contain at least 1 digit and be 8 characters long.'>
+      <label for='newpwd2'>Re-type New Password:</label>
+      <input id='newpwd2' name='newpwd2' ng-model="user.passwordrepeat" 
+              type='password' ui-validate="samePwd"
+              format-help='Must match password field exactly.'>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal" >Close</a>
+    <a class="btn btn-primary" ng-click="startRegister()">Sign Up!</a>
+  </div> 
+</form>
+</div>
+
+</div>
+

@@ -1,0 +1,8 @@
+{
+  "dbLocation":"/home/borislav/evalhalla/db",
+  "siteLocation":"/home/borislav/evalhalla/src/main",
+  "port":8182,
+  "smtp-host":"smtp.comcast.net",
+  "from-email":"no-reply@evalhalla.com",
+  "admin-email":"borislav.iordanov@gmail.com",
+}
