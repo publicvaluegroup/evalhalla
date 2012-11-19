@@ -1,6 +1,6 @@
 <div ng-controller="ahgUserController">
 
-<!-- LOGIN/LOGOUT -->
+<!-- LOGIN/LOGOUT panel displayed on upper right corner -->
 <div align="right" style="margin-right:100px">
 <a id='loginToggle'  
    href="#"
@@ -8,18 +8,21 @@
    ng-show="!isLoggedIn()">Login</a>
 <a ng-click="showRegister=true" ng-show="!isLoggedIn()">Register</a>
 
-<!-- LOGIN BOX -->
+<!-- LOGIN BOX popped up on click of Login button -->
 <div class="controls well well-small" id='loginDiv' align="right" 
      style="padding:5px; position:fixed; right:30px" ng-show='showLogin'>
 <div id='loginErrorDiv' style='color:red'>
 </div>
+<div align="left">
 <input type="text" placeholder="Email" ng-model="user.email"/>
 <br/>
 <input type="password" placeholder="Password" ng-model="user.password"/>
 <br/>
 <label align="left" class="checkbox inline" style="margin-right:20px">
-<input type="checkbox" ng-model="rememberUser">Remember me</label>
+<input type="checkbox" ng-model="rememberUser">Remember me</label><br/>
 <a class="btn btn-primary" ng-click='doLogin()'>Login</a>
+<a class="btn btn-primary" ng-click='showLogin=false'>Cancel</a>
+</div>
 </div>
 <div align="right" ng-show='isLoggedIn()'>
   <a class="btn btn-primary" ng-click="doLogout()">Sign Off</a>
@@ -27,7 +30,8 @@
 </div>
 
 
-<!-- REGISTRATION VALIDATION BOX -->
+<!-- REGISTRATION VALIDATION BOX : a small form to validate email by inputting
+  validation token sent by the server to the user. -->
 
 <div class="controls well well-small" align="right" 
      style="padding:5px; position:fixed; right:30px" 
@@ -48,8 +52,9 @@ Please verify your email address.
 </div>
 </div>
 
-<!-- REGISTER/PROFILE FORM-->
-<div id='userProfileForm' ui-modal class="fade" ng-model="showRegister">
+<!-- REGISTER/PROFILE FORM full bootstrapjs modal dialog,
+  displayed on click of the Register button-->
+<div id='userProfileForm' ui-modal class="fade" style="position:absolute;" ng-model="showRegister">
 <form name="registerForm" class="form-horizontal" ng-submit="startRegister">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

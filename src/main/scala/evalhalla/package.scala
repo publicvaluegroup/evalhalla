@@ -27,14 +27,20 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project. 
 */
 package object evalhalla {
+
   import mjson.Json
+  import mjson.Json.{`object`=>jobj};
 
   import org.hypergraphdb.HyperGraph
+  import org.hypergraphdb.HGHandle
+  import org.hypergraphdb.transaction.HGUserAbortException
   import org.hypergraphdb.HGConfiguration
   import mjson.hgdb.HyperNodeJson
   import mjson.hgdb.JsonTypeSchema
   import org.hypergraphdb.HGEnvironment
+  import java.util.regex.Pattern
   
+  val HANDLE_REGEX:Pattern  = Pattern.compile("[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}", Pattern.CASE_INSENSITIVE)  
   val True = java.lang.Boolean.TRUE;
   val False = java.lang.Boolean.FALSE;
   var graph:HyperGraph = null
@@ -62,17 +68,57 @@ package object evalhalla {
     });
   }
 
-  def transact[T](code:Unit => T) = {
-    try{
-    graph.getTransactionManager().transact(new java.util.concurrent.Callable[T]() {
-      def call:T = {
-        return code()
+  def transact[T](code:Unit => T):T = {
+    var result:T = null.asInstanceOf[T]
+    var done = false
+    var commit = true
+    while (!done) {
+      graph.getTransactionManager().beginTransaction()
+      try {
+        result = code()
+        commit = true;
+      } 
+      catch {
+        case e:HGUserAbortException => {
+          commit = false
+          done = true
+        }
+        case e:scala.runtime.NonLocalReturnControl[T] => {            
+            result = e.value
+            commit = true;
+        }
+        case e => {
+          commit = false          
+          if (!graph.getStore().getTransactionFactory().canRetryAfter(e))
+            throw e
+        }
+      }     
+      finally try {
+        graph.getTransactionManager().endTransaction(commit)
+        done = done || commit
+      } 
+      catch {
+        case e =>  {
+          if (!graph.getStore().getTransactionFactory().canRetryAfter(e))
+            throw e
+        }        
       }
-    });
     }
-    catch { case e:scala.runtime.NonLocalReturnControl[T] => e.value}
+    return result
   }
   
-  private[evalhalla] def registerIndexers:Unit = {
+  def isHandle(s:String):Boolean = { HANDLE_REGEX.matcher(s).matches() }  
+  def handleToAtom[T](h:String):T = { db.get(graph.getHandleFactory().makeHandle(h)) }
+  def asHandle(h:String):HGHandle = { graph.getHandleFactory().makeHandle(h) }
+  
+  def email(to:String, subject:String, body:String):Unit = {
+    email(config.at("from-email").asString(), to, subject, body);
+  }
+  
+  def email(from:String, to:String, subject:String, body:String):Unit = {
+      MailClient.getInstance().sendEmail(from, to, subject, body);
+  }
+  
+  private[evalhalla] def registerIndexers:Unit = {    
   }
 }

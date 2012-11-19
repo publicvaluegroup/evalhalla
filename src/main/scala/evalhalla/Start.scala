@@ -31,6 +31,10 @@ package evalhalla
 import javax.ws.rs._
 import java.io.File
 
+/**
+ * Contains the main application program. Reads configuration and sets up
+ * the HTTP rest server using the Restlet framework. 
+ */
 object Start {
 
   import org.restlet._;
@@ -96,8 +100,10 @@ object Start {
     
     router.attach("/rest", servicesApplication).setMatchingMode(Template.MODE_STARTS_WITH);
     router.setRoutingMode(Router.MODE_BEST_MATCH);
+    val auth:UserAuthenticator = new UserAuthenticator(router.getContext());
+    auth.setNext(router);
     
-    server.getDefaultHost().attach(router);
+    server.getDefaultHost().attach(auth);
     server.getServers().add(Protocol.HTTP, 8182);
     server.start();
     
@@ -105,11 +111,15 @@ object Start {
   }
 }
 
+/**
+ * The JSR 311 Application implementation that provides a list of
+ * all the REST services available. 
+ */
 class EValhallaApplication extends javax.ws.rs.core.Application {
   def getClasses() : java.util.Set[Class[_]] = {       
     var S = new java.util.HashSet[Class[_]]
+    S.add(classOf[evalhalla.DataService]);    
     S.add(classOf[evalhalla.user.UserService]);
-    S.add(classOf[evalhalla.UserServiceJava]);
     S.add(classOf[evalhalla.JsonEntityProvider]);
     return S;
   }
