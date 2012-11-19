@@ -68,7 +68,7 @@ class DataService {
       return ko("HyperGraphDB handle expected as last path component.") 
     var handle = evalhalla.asHandle(handleAsString)
     db.replace(handle, data, db.getType(handle))
-    return ok
+    return ok()
   }
 
   @GET
